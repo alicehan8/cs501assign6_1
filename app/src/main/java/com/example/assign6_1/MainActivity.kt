@@ -4,11 +4,17 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.health.connect.LocalTimeRangeFilter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -16,9 +22,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.assign6_1.ui.theme.Assign6_1Theme
+import kotlin.math.pow
 
 class MainActivity : ComponentActivity(), SensorEventListener {
 
@@ -36,12 +48,7 @@ class MainActivity : ComponentActivity(), SensorEventListener {
         enableEdgeToEdge()
         setContent {
             Assign6_1Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AltimeterScreen(_pressure)
             }
         }
     }
@@ -70,7 +77,45 @@ class MainActivity : ComponentActivity(), SensorEventListener {
 
 @Composable
 fun AltimeterScreen(pressure: Float){
+    // calculate the altitude based on the pressure
+    val altitude = 44330f * (1 - (pressure / 1013.25f).toDouble().pow(1 / 5.255))
 
+    // adjust darkness based on the altitude
+    val darknessFactor = (altitude / 10000).coerceIn(0.0, 1.0)
+    val backgroundColor = Color(
+        red = (1f - 0.5f * darknessFactor).toFloat(),
+        green = (1f - 0.5f * darknessFactor).toFloat(),
+        blue = (1f - 0.7f * darknessFactor).toFloat()
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "Altimeter", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            "Pressure: ${"%.2f".format(pressure)} hPa",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.DarkGray
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Altitude: ${"%.2f".format(altitude)} m",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.DarkGray
+        )
+    }
 }
 
 
