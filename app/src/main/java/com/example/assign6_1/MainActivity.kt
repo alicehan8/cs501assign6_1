@@ -80,7 +80,7 @@ fun AltimeterScreen(pressure: Float){
     // calculate the altitude based on the pressure
     val altitude = 44330f * (1 - (pressure / 1013.25f).toDouble().pow(1 / 5.255))
 
-    // adjust darkness based on the altitude
+    // change the background color using darker colors at higher altitudes
     val darknessFactor = (altitude / 10000).coerceIn(0.0, 1.0)
     val backgroundColor = Color(
         red = (1f - 0.5f * darknessFactor).toFloat(),
@@ -115,23 +115,5 @@ fun AltimeterScreen(pressure: Float){
             fontWeight = FontWeight.Medium,
             color = Color.DarkGray
         )
-    }
-}
-
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Assign6_1Theme {
-        Greeting("Android")
     }
 }
